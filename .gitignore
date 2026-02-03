@@ -2,6 +2,8 @@
 .venv/
 
 # Python
+Lib/
+Scripts/
 __pycache__/
 *.py[cod]
 *.pyo
