@@ -1,0 +1,40 @@
+{% extends "data_annotater/base.html" %}
+{% block title %}Needs Annotation{% endblock %}
+
+{% block content %}
+  <h2>Needs Annotation</h2>
+  <p class="muted">Records where segment is not yet set.</p>
+
+  {% if rows %}
+    <table>
+      <thead>
+        <tr>
+          <th>Merchant</th>
+          <th>SKU</th>
+          <th>Country</th>
+          <th>Retailer</th>
+          <th>Segment</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.merchant }}</td>
+            <td>{{ row.sku }}</td>
+            <td>{{ row.country }}</td>
+            <td>{{ row.retailer|default:"" }}</td>
+            <td>{{ row.segment|default:"" }}</td>
+            <td>
+              <a class="btn btn-secondary" href="{% url 'edit' row.pk %}">Annotate</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="card">
+      <p>No records need annotation 🎉</p>
+    </div>
+  {% endif %}
+{% endblock %}

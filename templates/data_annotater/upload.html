@@ -1,0 +1,35 @@
+{% extends "data_annotater/base.html" %}
+{% block title %}Upload CSV{% endblock %}
+
+{% block content %}
+  <h2>Upload CSV</h2>
+
+  <form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Upload &amp; Ingest</button>
+  </form>
+
+  {% if stats %}
+    <div class="card">
+      <h3>Ingestion Results</h3>
+      <ul>
+        <li><strong>Created:</strong> {{ stats.created }}</li>
+        <li><strong>Skipped (duplicates):</strong> {{ stats.skipped }}</li>
+        <li><strong>Invalid rows:</strong> {{ stats.invalid }}</li>
+        <li><strong>Errors:</strong> {{ stats.errors }}</li>
+      </ul>
+
+      {% if stats.error_samples %}
+        <details>
+          <summary>Show error samples</summary>
+          <ul>
+            {% for e in stats.error_samples %}
+              <li>{{ e }}</li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
