@@ -7,17 +7,23 @@ from .services import ingest_csv
 
 
 def upload(request):
-
-    stats = None
-
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
             uploaded = form.cleaned_data["csv_file"]
-            stats = ingest_csv(uploaded)
-            form = CSVUploadForm()
+            ingest_csv(uploaded)
+            return redirect("data_annotater:list")
     else:
         form = CSVUploadForm()
+
+    return render(
+        request,
+        "data_annotater/upload.html",
+        {"form": form},
+    )
+
+
+def retail_list(request):
 
     show_all = request.GET.get("view") == "all"
 
@@ -31,20 +37,9 @@ def upload(request):
 
     return render(
         request,
-        "data_annotater/upload.html",
-        {"form": form, "stats": stats, "rows": rows, "show_all": show_all},
+        "data_annotater/list.html",
+        {"rows": rows, "show_all": show_all},
     )
-
-
-def retail_list(request):
-
-    rows = (
-        RetailRow.objects
-        .filter(segment__isnull=True)
-        .order_by("country", "merchant", "sku")
-    )
-
-    return render(request, "data_annotater/list.html", {"rows": rows})
 
 
 def edit(request, pk: int):

@@ -3,7 +3,20 @@
 
 {% block content %}
   <h2>Needs Annotation</h2>
-  <p class="muted">Records where segment is not yet set.</p>
+  <p class="muted">
+    {% if show_all %}
+      Showing all records.
+    {% else %}
+      Showing records where retailer or segment is blank.
+    {% endif %}
+  </p>
+  <p>
+    {% if show_all %}
+      <a class="btn btn-secondary" href="{% url 'data_annotater:list' %}">Show Needing Annotation</a>
+    {% else %}
+      <a class="btn btn-secondary" href="{% url 'data_annotater:list' %}?view=all">Show All</a>
+    {% endif %}
+  </p>
 
   {% if rows %}
     <table>
@@ -34,7 +47,7 @@
     </table>
   {% else %}
     <div class="card">
-      <p>No records need annotation 🎉</p>
+      <p>No records were found.</p>
     </div>
   {% endif %}
 {% endblock %}
