@@ -33,9 +33,23 @@
     </div>
   {% endif %}
 
+  <h2>Records</h2>
+  <p class="muted">
+    {% if show_all %}
+      Showing all records.
+    {% else %}
+      Showing records where retailer or segment is blank.
+    {% endif %}
+  </p>
+  <p>
+    {% if show_all %}
+      <a class="btn btn-secondary" href="{% url 'data_annotater:upload' %}">Show Needing Annotation</a>
+    {% else %}
+      <a class="btn btn-secondary" href="{% url 'data_annotater:upload' %}?view=all">Show All</a>
+    {% endif %}
+  </p>
+
   {% if rows %}
-    <h2>Needs Annotation</h2>
-    <p class="muted">Records where segment is not yet set.</p>
     <table>
       <thead>
         <tr>

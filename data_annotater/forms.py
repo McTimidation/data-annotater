@@ -27,7 +27,7 @@ class RetailRowAnnotateForm(forms.ModelForm):
         retailer = (self.instance.retailer or "").strip()
 
         if not retailer and merchant:
-            self.fields["retailer"].initial = self._suggest_retailer(merchant)
+            self.initial["retailer"] = self._suggest_retailer(merchant)
 
     def clean_retailer(self):
         retailer = (self.cleaned_data.get("retailer") or "").strip()

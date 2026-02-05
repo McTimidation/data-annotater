@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Q
 
 from .forms import CSVUploadForm, RetailRowAnnotateForm
 from .models import RetailRow
@@ -18,16 +19,20 @@ def upload(request):
     else:
         form = CSVUploadForm()
 
-    rows = (
-        RetailRow.objects
-        .filter(segment__isnull=True)
-        .order_by("country", "merchant", "sku")
-    )
+    show_all = request.GET.get("view") == "all"
+
+    rows = RetailRow.objects.all()
+    if not show_all:
+        rows = rows.filter(
+            Q(segment__isnull=True) | Q(retailer__isnull=True) | Q(retailer="")
+        )
+
+    rows = rows.order_by("country", "merchant", "sku")
 
     return render(
         request,
         "data_annotater/upload.html",
-        {"form": form, "stats": stats, "rows": rows},
+        {"form": form, "stats": stats, "rows": rows, "show_all": show_all},
     )
 
 
