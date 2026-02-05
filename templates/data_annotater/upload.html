@@ -7,7 +7,7 @@
   <form method="post" enctype="multipart/form-data" class="card">
     {% csrf_token %}
     {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Upload &amp; Ingest</button>
+    <button class="btn btn-primary" type="submit">Submit</button>
   </form>
 
   {% if stats %}
@@ -31,5 +31,36 @@
         </details>
       {% endif %}
     </div>
+  {% endif %}
+
+  {% if rows %}
+    <h2>Needs Annotation</h2>
+    <p class="muted">Records where segment is not yet set.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Merchant</th>
+          <th>SKU</th>
+          <th>Country</th>
+          <th>Retailer</th>
+          <th>Segment</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.merchant }}</td>
+            <td>{{ row.sku }}</td>
+            <td>{{ row.country }}</td>
+            <td>{{ row.retailer|default:"" }}</td>
+            <td>{{ row.segment|default:"" }}</td>
+            <td>
+              <a class="btn btn-secondary" href="{% url 'data_annotater:edit' row.pk %}">Annotate</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% endif %}
 {% endblock %}

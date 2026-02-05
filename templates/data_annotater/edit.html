@@ -1,3 +1,38 @@
-<h2>    
-    Edit
-</h2>
+{% extends "data_annotater/base.html" %}
+{% block title %}Annotate Row{% endblock %}
+
+{% block content %}
+  <h2>Annotate Record</h2>
+
+  <div class="card">
+    <p><strong>Merchant:</strong> {{ row.merchant }}</p>
+    <p><strong>SKU:</strong> {{ row.sku }}</p>
+    <p><strong>Country:</strong> {{ row.country }}</p>
+  </div>
+
+  <form method="post" class="card">
+    {% csrf_token %}
+
+    <p>
+      <label for="{{ form.retailer.id_for_label }}">Retailer</label><br />
+      {{ form.retailer }}
+      {% if form.retailer.help_text %}
+        <small class="muted">{{ form.retailer.help_text }}</small>
+      {% endif %}
+      {% for error in form.retailer.errors %}
+        <br /><small style="color:#b00020;">{{ error }}</small>
+      {% endfor %}
+    </p>
+
+    <p>
+      <label for="{{ form.segment.id_for_label }}">Segment</label><br />
+      {{ form.segment }}
+      {% for error in form.segment.errors %}
+        <br /><small style="color:#b00020;">{{ error }}</small>
+      {% endfor %}
+    </p>
+
+    <button class="btn btn-primary" type="submit">Save Annotation</button>
+    <a class="btn btn-secondary" href="{% url 'data_annotater:upload' %}">Cancel</a>
+  </form>
+{% endblock %}

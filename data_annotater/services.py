@@ -1,12 +1,9 @@
-# annotater/services.py
 from __future__ import annotations
 
 import csv
 import io
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional
-
-from django.db import IntegrityError
+from typing import Any, Dict, List, Optional
 
 from .models import RetailRow
 
@@ -21,60 +18,41 @@ class IngestStats:
 
 
 def ingest_csv(uploaded_file) -> Dict[str, Any]:
-    """
-    Parse the uploaded CSV and insert RetailRow records.
-    - Skips duplicates via (merchant, sku, country) uniqueness
-    - Does NOT overwrite retailer/segment if a record already exists
-    Returns a stats dict safe to display in UI.
-    """
     stats = IngestStats(error_samples=[])
 
-    # 1) Read & decode
     try:
-        raw = uploaded_file.read()
-        text = raw.decode("utf-8-sig")  # handles BOM
+        text = uploaded_file.read().decode("utf-8-sig")
     except Exception as e:
         stats.errors += 1
         stats.error_samples.append(f"Failed to read/decode file: {e}")
         return _stats_to_dict(stats)
 
-    # 2) Parse CSV
-    f = io.StringIO(text)
-    reader = csv.DictReader(f)
-
-    # Optional: defensive check for expected headers
-    expected = {"merchant", "sku", "country"}
-    if not reader.fieldnames or not expected.issubset(set(h.strip() for h in reader.fieldnames)):
-        stats.errors += 1
-        stats.error_samples.append(f"Missing required headers: {expected}")
-        return _stats_to_dict(stats)
+    reader = csv.DictReader(io.StringIO(text))
 
     for row in reader:
         try:
             merchant = (row.get("merchant") or "").strip()
             sku = (row.get("sku") or "").strip()
-            country = (row.get("country") or "").strip().upper()
+            country = (row.get("productcountry") or "").strip()
 
-            # 3) Basic validation
             if not merchant or not sku or not country:
                 stats.invalid += 1
                 continue
 
-            # 4) Insert-or-skip. Do NOT overwrite annotations.
-            obj, created = RetailRow.objects.get_or_create(
+            if RetailRow.objects.filter(
                 merchant=merchant,
                 sku=sku,
                 country=country,
-                defaults={},
-            )
-
-            if created:
-                stats.created += 1
-            else:
+            ).exists():
                 stats.skipped += 1
+                continue
 
-        except IntegrityError:
-            stats.skipped += 1
+            RetailRow.objects.create(
+                merchant=merchant,
+                sku=sku,
+                country=country,
+            )
+            stats.created += 1
         except Exception as e:
             stats.errors += 1
             if stats.error_samples is not None and len(stats.error_samples) < 10:

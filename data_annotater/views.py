@@ -18,7 +18,17 @@ def upload(request):
     else:
         form = CSVUploadForm()
 
-    return render(request, "data_annotater/upload.html", {"form": form, "stats": stats})
+    rows = (
+        RetailRow.objects
+        .filter(segment__isnull=True)
+        .order_by("country", "merchant", "sku")
+    )
+
+    return render(
+        request,
+        "data_annotater/upload.html",
+        {"form": form, "stats": stats, "rows": rows},
+    )
 
 
 def retail_list(request):
@@ -40,7 +50,7 @@ def edit(request, pk: int):
         form = RetailRowAnnotateForm(request.POST, instance=row)
         if form.is_valid():
             form.save()
-            return redirect("list")
+            return redirect("data_annotater:upload")
     else:
         form = RetailRowAnnotateForm(instance=row)
 
