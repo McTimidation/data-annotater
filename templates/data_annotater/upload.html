@@ -2,6 +2,7 @@
 {% block title %}Upload CSV{% endblock %}
 
 {% block content %}
+{% if not stats %}
   <h2>Upload CSV</h2>
 
   <form method="post" enctype="multipart/form-data" class="card">
@@ -9,4 +10,16 @@
     {{ form.as_p }}
     <button class="btn btn-primary" type="submit">Submit</button>
   </form>
+  {% else %}
+  <hr>
+  <h3>Upload results</h3>
+  <ul>
+    <li><strong>Created:</strong> {{ stats.created }}</li>
+    <li><strong>Skipped (duplicates):</strong> {{ stats.skipped }}</li>
+    <li><strong>Invalid rows:</strong> {{ stats.invalid }}</li>
+    <li><strong>Errors:</strong> {{ stats.errors }}</li>
+  </ul>
+  <a href="{% url 'data_annotater:list' %}"><button class="btn btn-primary">View All</button></a>
+
+{% endif %}
 {% endblock %}

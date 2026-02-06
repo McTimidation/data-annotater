@@ -7,20 +7,25 @@ from .services import ingest_csv
 
 
 def upload(request):
+    stats = None
+    uploaded_ok = False
+
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
             uploaded = form.cleaned_data["csv_file"]
-            ingest_csv(uploaded)
-            return redirect("data_annotater:list")
+            stats = ingest_csv(uploaded)
+            uploaded_ok = True
+            form = CSVUploadForm()
     else:
         form = CSVUploadForm()
 
     return render(
         request,
         "data_annotater/upload.html",
-        {"form": form},
+        {"form": form, "stats": stats, "uploaded_ok": uploaded_ok},
     )
+
 
 
 def retail_list(request):
