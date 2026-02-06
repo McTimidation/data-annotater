@@ -7,7 +7,7 @@ class RetailRow(models.Model):
 
     merchant = models.CharField(max_length=100)
     sku = models.CharField(max_length=100)
-    country = models.CharField(max_length=2)
+    country = models.CharField(max_length=3)
 
     retailer = models.CharField(max_length=100, blank=True)
     segment = models.CharField(

@@ -50,7 +50,7 @@ def edit(request, pk: int):
         form = RetailRowAnnotateForm(request.POST, instance=row)
         if form.is_valid():
             form.save()
-            return redirect("data_annotater:upload")
+            return redirect("data_annotater:list")
     else:
         form = RetailRowAnnotateForm(instance=row)
 
